@@ -1,5 +1,4 @@
 import com.mysql.jdbc.Driver;
-
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.List;
@@ -16,14 +15,14 @@ public class Main
 		}
 
 		DatabaseServer databaseServer = new DatabaseServer(
-				"localhost", "javadb", "jdbc", "pas123");
+				"localhost", "pizza_maker", "patryk", "pas123");
 
-		DatabaseUsersDAO usersDAO = new DatabaseUsersDAO(databaseServer);
+		PizzaDAO usersDAO = new PizzaDAO(databaseServer);
 
-		List<User> users = usersDAO.get();
+		List<Pizza> pizzas = usersDAO.get();
 
-		for(User user : users) {
-			System.out.println(user.toString());
+		for(Pizza pizza : pizzas) {
+			System.out.println(pizza.toString());
 		}
 
 		usersDAO.close();

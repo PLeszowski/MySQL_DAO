@@ -4,16 +4,20 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DatabaseUsersDAO implements UsersDAO {
-	public static final String ID_COLUMN = "id";
-	public static final String NAME_COLUMN = "name";
-	public static final String SURNAME_COLUMN = "surname";
+/**
+ * Created by RENT on 2017-07-21.
+ */
+public class PizzaCrustDAO implements DAO<PizzaCrust> {
 
-	public static final String GET_ALL_SQL = "select * from users;";
+	public static final String ID_COLUMN = "ID";
+	public static final String CRUST_TYPE_COLUMN = "CRUST_TYPE";
+	public static final String CRUST_PRICE_COLUMN = "CRUST_PRICE";
+
+	public static final String GET_ALL_SQL = "select * from pizza_crust;";
 
 	private DatabaseServer server;
 
-	public DatabaseUsersDAO(DatabaseServer server) {
+	public PizzaCrustDAO(DatabaseServer server) {
 		this.server = server;
 
 		try {
@@ -23,13 +27,10 @@ public class DatabaseUsersDAO implements UsersDAO {
 		}
 	}
 
-	public void close() {
-		server.close();
-	}
 
 	@Override
-	public List<User> get() {
-		List<User> users = new ArrayList<>();
+	public List<PizzaCrust> get() {
+		List<PizzaCrust> pizzaCrusts = new ArrayList<>();
 
 		Statement statement = null;
 		try {
@@ -38,10 +39,10 @@ public class DatabaseUsersDAO implements UsersDAO {
 			ResultSet resultSet = statement.executeQuery(GET_ALL_SQL);
 			while(resultSet.next()) {
 				int id = resultSet.getInt(resultSet.findColumn(ID_COLUMN));
-				String name = resultSet.getString(resultSet.findColumn(NAME_COLUMN));
-				String surname = resultSet.getString(resultSet.findColumn(SURNAME_COLUMN));
+				String crustType = resultSet.getString(resultSet.findColumn(CRUST_TYPE_COLUMN));
+				int crustPrice = resultSet.getInt(resultSet.findColumn(CRUST_PRICE_COLUMN));
 
-				users.add(new User(id, name, surname));
+				pizzaCrusts.add(new PizzaCrust(id, crustType, crustPrice));
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -54,38 +55,20 @@ public class DatabaseUsersDAO implements UsersDAO {
 				}
 			}
 		}
-		return users;
+		return pizzaCrusts;
 	}
 
 	@Override
-	public void add(User user) {
+	public void add(PizzaCrust pizzaCrust) {
+
 		Statement statement = null;
 		try {
 			statement = server.createStatement();
 
-			statement.executeUpdate("insert into users (name, surname) values (\"" +
-					user.getName() + "\", \"" + user.getSurname() + "\");");
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			if(statement != null) {
-				try {
-					statement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
+			statement.executeUpdate("insert into pizza_crust (CRUST_TYPE, CRUST_PRICE) values (\"" +
+					pizzaCrust.getType() + "\", \"" + pizzaCrust.getPrice() + "\"");
 
-	@Override
-	public void update(User user) {
-		Statement statement = null;
-		try {
-			statement = server.createStatement();
 
-			statement.executeUpdate("update users set name = \"" + user.getName() +
-					"\", surname = \"" + user.getSurname() + "\" where id = " + user.getId());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -100,12 +83,13 @@ public class DatabaseUsersDAO implements UsersDAO {
 	}
 
 	@Override
-	public void delete(User user) {
+	public void update(PizzaCrust pizzaCrust) {
 		Statement statement = null;
 		try {
 			statement = server.createStatement();
 
-			statement.executeUpdate("delete from users where id = " + user.getId());
+			statement.executeUpdate("update pizza_crust set CRUST_TYPE = \"" + pizzaCrust.getType() +
+					"\", CRUST_PRICE = \"" + pizzaCrust.getPrice() + pizzaCrust.getId());
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} finally {
@@ -119,4 +103,23 @@ public class DatabaseUsersDAO implements UsersDAO {
 		}
 	}
 
+	@Override
+	public void delete(PizzaCrust pizzaCrust) {
+		Statement statement = null;
+		try {
+			statement = server.createStatement();
+
+			statement.executeUpdate("delete from pizza_crust where ID = " + pizzaCrust.getId());
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} finally {
+			if(statement != null) {
+				try {
+					statement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
 }
